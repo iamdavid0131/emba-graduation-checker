@@ -290,6 +290,10 @@ body {
   font-size: .78rem; color: var(--muted);
   border-top: 1px solid var(--border); margin-top: .5rem;
 }
+.footer-author {
+  margin-top: .4rem;
+  font-size: .82rem; font-weight: 600; color: var(--text);
+}
 
 /* ══════════════════════════════════════════════════════════════
    Mobile  ≤ 600px
