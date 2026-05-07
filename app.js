@@ -3,6 +3,7 @@ import {
   SPECIALTY_COURSES, COMMON_COURSES, REMEDIAL_COURSES, RULES
 } from "./data.js";
 import { exportInfographic } from "./export.js";
+import { initReviews } from "./reviews-ui.js";
 
 // ── State ─────────────────────────────────────────────────────
 let state = {
@@ -457,4 +458,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("change", onCourseChange);
   render();
+  initReviews();
 });
