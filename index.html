@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMBA 畢業條件勾稽系統</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon">🎓</div>
+      <div>
+        <h1>EMBA 畢業條件勾稽</h1>
+        <p>勾選已修科目，即時追蹤畢業進度</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn-export" class="btn-primary">⬇ 匯出圖表</button>
+      <button id="btn-reset" class="btn-ghost">↺ 重置進度</button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ─── Left column ────────────────────────────────────────── -->
+  <aside class="sidebar">
+
+    <!-- Track selector -->
+    <section class="card">
+      <h2 class="card-title">目前組別</h2>
+      <div id="track-selector" class="track-grid">
+        <button class="track-btn" data-track="企管">企管組</button>
+        <button class="track-btn" data-track="財金">財金組</button>
+        <button class="track-btn" data-track="會管">會管組</button>
+        <button class="track-btn" data-track="行銷">行銷組</button>
+        <button class="track-btn" data-track="科健">科健組</button>
+      </div>
+    </section>
+
+    <!-- Donut chart -->
+    <section class="card chart-card">
+      <h2 class="card-title">整體進度</h2>
+      <div class="donut-wrap">
+        <canvas id="donut-chart"></canvas>
+        <div id="donut-center" class="donut-center">
+          <div class="donut-big">0</div>
+          <div class="donut-sub">/ 48 學分</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div id="card-total" class="stat-card card-neutral">
+        <div class="stat-label">總學分</div>
+        <div class="stat-value">
+          <span id="stat-total-done">0</span>
+          <span class="stat-denom">/ <span id="stat-total-need">48</span></span>
+        </div>
+        <div class="stat-sub" id="stat-pct">0%</div>
+      </div>
+      <div id="card-elec" class="stat-card card-ng">
+        <div class="stat-label">選修學分</div>
+        <div class="stat-value">
+          <span id="stat-elec-done">0</span>
+          <span class="stat-denom">/ <span id="stat-elec-need">36</span></span>
+        </div>
+      </div>
+      <div id="card-courses" class="stat-card card-ng">
+        <div class="stat-label">選修門數</div>
+        <div class="stat-value">
+          <span id="stat-courses-done">0</span>
+          <span class="stat-denom">/ <span id="stat-courses-need">12</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bars -->
+    <section class="card">
+      <h2 class="card-title">分項進度</h2>
+      <div id="prog-bars"></div>
+    </section>
+
+    <!-- Graduation checklist pills -->
+    <section class="card">
+      <h2 class="card-title">畢業條件檢核</h2>
+      <div id="summary-pills" class="pills-wrap"></div>
+    </section>
+
+  </aside>
+
+  <!-- ─── Right column ───────────────────────────────────────── -->
+  <div class="content">
+
+    <!-- Bar chart -->
+    <section class="card">
+      <h2 class="card-title">各類別進度</h2>
+      <div class="bar-wrap">
+        <canvas id="bar-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- Tabs: course checklists -->
+    <section class="card checklist-card">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="required">必修科目</button>
+        <button class="tab-btn" data-tab="core">核心科目</button>
+        <button class="tab-btn" data-tab="specialty">專業科目</button>
+        <button class="tab-btn" data-tab="common">共同科目</button>
+        <button class="tab-btn" data-tab="misc">補修 ／ 口試前</button>
+      </div>
+
+      <!-- Required -->
+      <div id="pane-required" class="tab-pane active">
+        <p class="pane-note">應修 12 學分（必修學科 6 學分 ＋ 碩士論文 6 學分）</p>
+        <div id="list-required" class="course-list"></div>
+      </div>
+
+      <!-- Core -->
+      <div id="pane-core" class="tab-pane">
+        <p class="pane-note">至少選修 <strong>4 門</strong></p>
+        <div id="list-core" class="course-list"></div>
+      </div>
+
+      <!-- Specialty -->
+      <div id="pane-specialty" class="tab-pane">
+        <p class="pane-note" id="specialty-note">請先選擇組別</p>
+        <div id="list-specialty"></div>
+      </div>
+
+      <!-- Common -->
+      <div id="pane-common" class="tab-pane">
+        <p class="pane-note">核心 ＋ 專業 ＋ 共同，累計至少 <strong>12 門、36 學分</strong></p>
+        <div id="list-common" class="course-list"></div>
+      </div>
+
+      <!-- Misc -->
+      <div id="pane-misc" class="tab-pane">
+        <p class="pane-note">補修大學部基礎科目（如被要求）及口試申請前條件</p>
+        <h3 class="sub-title">補修科目</h3>
+        <div id="list-remedial" class="course-list"></div>
+        <h3 class="sub-title" style="margin-top:1.5rem">申請口試前應完成</h3>
+        <div class="course-list">
+          <label class="course-item" id="item-ethics">
+            <input type="checkbox" id="cb-ethics" data-cat="ethics">
+            <span class="check-icon"></span>
+            <span class="course-name">學術倫理教育</span>
+          </label>
+          <label class="course-item" id="item-cert">
+            <input type="checkbox" id="cb-cert" data-cat="cert">
+            <span class="check-icon"></span>
+            <span class="course-name">繳交「修課證明」</span>
+          </label>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <p>依據「畢業條件自我勾稽表」(111.5 版)　／　資料存於本機瀏覽器，關閉後不遺失</p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
