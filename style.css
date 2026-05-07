@@ -653,3 +653,45 @@ body {
 .rv-submit-btn:disabled {
   opacity: .6; cursor: not-allowed; transform: none;
 }
+
+/* ── Instructor sections ─────────────────────────────────────── */
+.rv-instructors {
+  display: flex; flex-direction: column;
+}
+.rv-instr-section {
+  border-bottom: 1px solid var(--border);
+}
+.rv-instr-section:last-child { border-bottom: none; }
+.rv-instr-legacy { opacity: .75; }
+
+.rv-instr-head {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .65rem 1rem;
+  background: #fafbff;
+}
+.rv-instr-name {
+  font-size: .85rem; font-weight: 700; color: var(--text);
+  flex: 1;
+}
+.rv-instr-meta {
+  display: flex; align-items: center; gap: .3rem;
+  font-size: .82rem;
+}
+.rv-instr-reviews {
+  padding: .4rem .75rem .65rem 2.5rem;
+  display: flex; flex-direction: column; gap: .5rem;
+  max-height: 280px; overflow-y: auto;
+}
+
+/* ── Form instructor field ───────────────────────────────────── */
+.rv-instr-sel, .rv-instr-in {
+  flex: 1; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: .42rem .7rem;
+  font-size: .84rem; font-family: inherit;
+  outline: none; transition: .15s;
+  background: var(--bg);
+  min-width: 0;
+}
+.rv-instr-sel:focus, .rv-instr-in:focus {
+  border-color: var(--indigo); background: #fff;
+}

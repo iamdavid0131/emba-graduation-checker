@@ -22,12 +22,12 @@ export async function fetchAllReviews() {
 }
 
 // ── 送出評價 ──────────────────────────────────────────────────
-export async function submitReview({ course_name, nickname, rating, comment }) {
+export async function submitReview({ course_name, nickname, rating, comment, instructor = '' }) {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
       method: 'POST',
       headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ course_name, nickname, rating, comment }),
+      body: JSON.stringify({ course_name, nickname, rating, comment, instructor }),
     });
     return res.ok;
   } catch {
