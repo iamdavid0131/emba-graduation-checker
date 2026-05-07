@@ -284,10 +284,25 @@ export function exportInfographic(state, analyze) {
   ctx.fillText("依據「畢業條件自我勾稽表」(111.5 版)　資料僅供個人參考", W / 2, Y + 24);
   ctx.textAlign = "left";
 
-  // ── 下載 ─────────────────────────────────────────────────
-  const link = document.createElement("a");
-  const trackName = state.track ?? "未選組別";
-  link.download = `EMBA畢業勾稽_${trackName}組_${new Date().toLocaleDateString("zh-TW").replace(/\//g,"-")}.png`;
-  link.href     = canvas.toDataURL("image/png");
-  link.click();
+  // ── 開新分頁顯示圖片（手機長按即可儲存）────────────────────
+  const dataUrl = canvas.toDataURL("image/png");
+  const win = window.open("", "_blank");
+  if (win) {
+    win.document.write(`<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EMBA畢業勾稽</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#1e293b; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:16px; }
+  p { color:#94a3b8; font-size:14px; margin-bottom:12px; font-family:sans-serif; text-align:center; }
+  img { max-width:100%; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,.4); }
+</style>
+</head><body>
+<p>📱 長按圖片即可儲存到相簿</p>
+<img src="${dataUrl}" alt="EMBA畢業勾稽">
+</body></html>`);
+    win.document.close();
+  }
 }

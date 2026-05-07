@@ -324,11 +324,8 @@ body {
   }
   .header-brand p  { display: none; }   /* 副標題隱藏 */
   .header-actions  { gap: .35rem; flex-shrink: 0; }
-  /* 按鈕只顯示圖示 */
-  .btn-primary { padding: .38rem .6rem; font-size: .82rem; }
-  .btn-ghost   { padding: .38rem .6rem; font-size: .82rem; }
-  .btn-primary .btn-text,
-  .btn-ghost   .btn-text { display: none; }
+  .btn-primary { padding: .38rem .6rem; font-size: .78rem; }
+  .btn-ghost   { padding: .38rem .6rem; font-size: .78rem; }
 
   /* ── Layout ────────────────────────────────────────────────── */
   .layout { padding: .75rem; gap: .75rem; }
