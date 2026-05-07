@@ -138,13 +138,16 @@ function panelHtml(name) {
   const allInstructors    = [...new Set([...knownInstructors, ...reviewInstructors])];
   const unknownReviews    = cached.filter(r => !r.instructor);
 
-  // 表單教師欄
-  const instrFormField = allInstructors.length
-    ? `<select class="rv-instr-sel" data-course="${name}">
-         <option value="">選擇任課教師 *</option>
-         ${allInstructors.map(i => `<option value="${i}">${i}</option>`).join('')}
-       </select>`
-    : `<input class="rv-instr-in" data-course="${name}" placeholder="任課教師（必填）" maxlength="20">`;
+  // 表單教師欄：只有一位 → 隱藏，自動帶入；多位 → 下拉；未知 → 文字輸入
+  const instrFormField = allInstructors.length === 1
+    ? `<input type="hidden" class="rv-instr-sel" data-course="${name}" value="${allInstructors[0]}">
+       <span class="rv-instr-fixed">👤 ${allInstructors[0]}</span>`
+    : allInstructors.length > 1
+      ? `<select class="rv-instr-sel" data-course="${name}">
+           <option value="">選擇任課教師 *</option>
+           ${allInstructors.map(i => `<option value="${i}">${i}</option>`).join('')}
+         </select>`
+      : `<input class="rv-instr-in" data-course="${name}" placeholder="任課教師（必填）" maxlength="20">`;
 
   return `
     <div class="rv-panel">

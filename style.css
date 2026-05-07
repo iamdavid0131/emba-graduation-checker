@@ -619,7 +619,9 @@ body {
 
 /* Star picker */
 .rv-star-row {
-  display: flex; gap: .15rem; flex-shrink: 0;
+  display: flex; gap: .25rem;
+  justify-content: center;
+  margin: .6rem 0;
 }
 .rv-s {
   font-size: 1.4rem; color: #cbd5e1; cursor: pointer;
@@ -694,6 +696,10 @@ body {
 }
 .rv-instr-sel:focus, .rv-instr-in:focus {
   border-color: var(--indigo); background: #fff;
+}
+.rv-instr-fixed {
+  flex: 1; font-size: .84rem; font-weight: 600;
+  color: var(--muted); padding: .42rem .2rem;
 }
 
 /* ── Show-more button ────────────────────────────────────────── */
