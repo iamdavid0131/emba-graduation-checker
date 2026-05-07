@@ -300,14 +300,33 @@ body {
   html { font-size: 14px; }
 
   /* ── Header ────────────────────────────────────────────────── */
-  .header-inner { padding: .55rem .85rem; gap: .4rem; }
-  .brand-icon   { font-size: 1.55rem; }
-  .header-brand h1 { font-size: .95rem; white-space: nowrap; }
-  .header-brand p  { display: none; }          /* 副標題隱藏 */
-  .header-actions  { gap: .4rem; }
-  .btn-primary { padding: .35rem .65rem; font-size: .75rem; }
-  .btn-ghost   { padding: .35rem .65rem; font-size: .75rem; }
-  /* 在極窄螢幕只顯示圖示 */
+  .header-inner {
+    padding: .5rem .85rem;
+    gap: .5rem;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .header-brand {
+    min-width: 0;        /* 允許 flex 子項縮小 */
+    flex: 1;
+    gap: .5rem;
+    align-items: center;
+  }
+  .header-brand > div {
+    min-width: 0;        /* 讓文字容器可以被截斷 */
+  }
+  .brand-icon   { font-size: 1.4rem; flex-shrink: 0; }
+  .header-brand h1 {
+    font-size: .9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-brand p  { display: none; }   /* 副標題隱藏 */
+  .header-actions  { gap: .35rem; flex-shrink: 0; }
+  /* 按鈕只顯示圖示 */
+  .btn-primary { padding: .38rem .6rem; font-size: .82rem; }
+  .btn-ghost   { padding: .38rem .6rem; font-size: .82rem; }
   .btn-primary .btn-text,
   .btn-ghost   .btn-text { display: none; }
 
