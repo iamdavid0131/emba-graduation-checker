@@ -286,7 +286,7 @@ export function exportInfographic(state, analyze) {
   ctx.fillText("依據「畢業條件自我勾稽表」(111.5 版)　資料僅供個人參考", W / 2, Y + 24);
   ctx.font      = "600 13px 'Noto Sans TC', sans-serif";
   ctx.fillStyle = C.text;
-  ctx.fillText("製作者：114 財金 陳家祥", W / 2, Y + 46);
+  ctx.fillText("網頁製作：114 財金 陳家祥", W / 2, Y + 46);
   ctx.textAlign = "left";
 
   // ── 開新分頁顯示圖片（手機長按即可儲存）────────────────────
