@@ -7,11 +7,25 @@ const HEADERS = {
   'Content-Type': 'application/json',
 };
 
-// ── 取得所有評價 ──────────────────────────────────────────────
-export async function fetchAllReviews() {
+// ── 取得統計摘要（僅 3 欄，輕量）────────────────────────────
+export async function fetchReviewStats() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/reviews?select=*&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/reviews?select=course_name,instructor,rating`,
+      { headers: HEADERS }
+    );
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+// ── 取得單一課程完整評價 ──────────────────────────────────────
+export async function fetchCourseReviews(courseName) {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/reviews?course_name=eq.${encodeURIComponent(courseName)}&select=*&order=created_at.desc`,
       { headers: HEADERS }
     );
     if (!res.ok) return [];

@@ -2,7 +2,7 @@ import {
   REQUIRED_COURSES, CORE_COURSES,
   SPECIALTY_COURSES, COMMON_COURSES, COURSE_INSTRUCTORS,
 } from './data.js';
-import { fetchAllReviews, submitReview } from './reviews.js';
+import { fetchReviewStats, fetchCourseReviews, submitReview } from './reviews.js';
 
 // ── 課程分組 ──────────────────────────────────────────────────
 const GROUPS = [
@@ -14,31 +14,37 @@ const GROUPS = [
   { label: '共同選修',  courses: COMMON_COURSES },
 ];
 
-// ── 狀態 ──────────────────────────────────────────────────────
-let _reviews  = [];
-let _expanded = null;
-let _loading  = true;
-let _query    = '';
+const REVIEWS_LIMIT = 5; // 每位教師預設顯示則數
 
-// ── 工具 ──────────────────────────────────────────────────────
+// ── 狀態 ──────────────────────────────────────────────────────
+let _statRows      = [];   // 輕量統計：[{course_name, instructor, rating}]
+let _courseCache   = {};   // 完整評價快取：{courseName: [{...}]}
+let _courseLoading = new Set();  // 正在載入的課程
+let _showAllKey    = new Set();  // "courseName|||instructor" → 展開全部
+let _expanded      = null;
+let _loading       = true;
+let _query         = '';
+
+// ── 統計工具（讀 _statRows，輕量）────────────────────────────
 function overallStats(name) {
-  const rs = _reviews.filter(r => r.course_name === name);
-  if (!rs.length) return { avg: 0, count: 0 };
+  const rows = _statRows.filter(r => r.course_name === name);
+  if (!rows.length) return { avg: 0, count: 0 };
   return {
-    avg:   rs.reduce((s, r) => s + r.rating, 0) / rs.length,
-    count: rs.length,
+    avg:   rows.reduce((s, r) => s + r.rating, 0) / rows.length,
+    count: rows.length,
   };
 }
 
 function instructorStats(name, instructor) {
-  const rs = _reviews.filter(r => r.course_name === name && r.instructor === instructor);
-  if (!rs.length) return { avg: 0, count: 0 };
+  const rows = _statRows.filter(r => r.course_name === name && r.instructor === instructor);
+  if (!rows.length) return { avg: 0, count: 0 };
   return {
-    avg:   rs.reduce((s, r) => s + r.rating, 0) / rs.length,
-    count: rs.length,
+    avg:   rows.reduce((s, r) => s + r.rating, 0) / rows.length,
+    count: rows.length,
   };
 }
 
+// ── 格式工具 ──────────────────────────────────────────────────
 function timeAgo(ts) {
   const m = Math.max(1, Math.floor((Date.now() - new Date(ts)) / 60000));
   if (m < 60)  return `${m} 分鐘前`;
@@ -50,11 +56,18 @@ function timeAgo(ts) {
 }
 
 function stars(n, color = false) {
-  const filled = '★'.repeat(Math.round(n));
-  const empty  = '☆'.repeat(5 - Math.round(n));
+  const r = Math.round(n);
+  const filled = '★'.repeat(r);
+  const empty  = '☆'.repeat(5 - r);
   return color
     ? `<span style="color:#f59e0b">${filled}</span>${empty}`
     : filled + empty;
+}
+
+function highlight(name) {
+  if (!_query) return name;
+  const re = new RegExp(`(${_query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return name.replace(re, '<mark class="rv-hl">$1</mark>');
 }
 
 // ── HTML 片段 ─────────────────────────────────────────────────
@@ -71,8 +84,15 @@ function reviewItemHtml(r) {
 }
 
 function instructorSectionHtml(courseName, instructor) {
-  const rs = _reviews.filter(r => r.course_name === courseName && r.instructor === instructor);
+  const cached  = _courseCache[courseName];
+  const allRevs = cached ? cached.filter(r => r.instructor === instructor) : [];
   const { avg, count } = instructorStats(courseName, instructor);
+
+  const key      = `${courseName}|||${instructor}`;
+  const showAll  = _showAllKey.has(key);
+  const shown    = showAll ? allRevs : allRevs.slice(0, REVIEWS_LIMIT);
+  const remaining = allRevs.length - REVIEWS_LIMIT;
+
   return `
     <div class="rv-instr-section">
       <div class="rv-instr-head">
@@ -86,28 +106,39 @@ function instructorSectionHtml(courseName, instructor) {
           }
         </span>
       </div>
-      ${rs.length ? `<div class="rv-instr-reviews">${rs.map(reviewItemHtml).join('')}</div>` : ''}
+      ${shown.length ? `
+        <div class="rv-instr-reviews">
+          ${shown.map(reviewItemHtml).join('')}
+          ${!showAll && remaining > 0 ? `
+            <button class="rv-more-btn"
+              data-course="${courseName}"
+              data-instructor="${instructor}">
+              查看更多（還有 ${remaining} 則）▼
+            </button>` : ''
+          }
+        </div>` : ''
+      }
     </div>`;
 }
 
 function panelHtml(name) {
-  // 已知教師清單
-  const knownInstructors = COURSE_INSTRUCTORS[name] || [];
+  // 載入中
+  if (_courseLoading.has(name)) {
+    return `
+      <div class="rv-panel">
+        <div class="rv-loading" style="padding:1.2rem">⏳ 載入評價中…</div>
+      </div>`;
+  }
 
-  // 已有評價但不在已知清單的教師
-  const reviewInstructors = [
-    ...new Set(
-      _reviews
-        .filter(r => r.course_name === name && r.instructor)
-        .map(r => r.instructor)
-    ),
-  ];
-  const allInstructors = [...new Set([...knownInstructors, ...reviewInstructors])];
+  const cached = _courseCache[name] || [];
 
-  // 沒有填教師的舊評價
-  const unknownReviews = _reviews.filter(r => r.course_name === name && !r.instructor);
+  // 已知教師 + 評價中出現的教師
+  const knownInstructors  = COURSE_INSTRUCTORS[name] || [];
+  const reviewInstructors = [...new Set(cached.filter(r => r.instructor).map(r => r.instructor))];
+  const allInstructors    = [...new Set([...knownInstructors, ...reviewInstructors])];
+  const unknownReviews    = cached.filter(r => !r.instructor);
 
-  // 表單：教師欄（已知→下拉；未知→文字輸入）
+  // 表單教師欄
   const instrFormField = allInstructors.length
     ? `<select class="rv-instr-sel" data-course="${name}">
          <option value="">選擇任課教師 *</option>
@@ -117,7 +148,6 @@ function panelHtml(name) {
 
   return `
     <div class="rv-panel">
-
       <div class="rv-instructors">
         ${allInstructors.length
           ? allInstructors.map(i => instructorSectionHtml(name, i)).join('')
@@ -146,12 +176,6 @@ function panelHtml(name) {
         <button class="rv-submit-btn" data-course="${name}">送出評價</button>
       </div>
     </div>`;
-}
-
-function highlight(name) {
-  if (!_query) return name;
-  const re = new RegExp(`(${_query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return name.replace(re, '<mark class="rv-hl">$1</mark>');
 }
 
 function courseHtml(name) {
@@ -203,28 +227,53 @@ function render() {
 
 // ── 事件綁定 ──────────────────────────────────────────────────
 function bindEvents() {
-  // 展開 / 收合
+  // 展開 / 收合（lazy load）
   document.querySelectorAll('.rv-course-row').forEach(row => {
-    row.addEventListener('click', () => {
+    row.addEventListener('click', async () => {
       const name = row.closest('.rv-course').dataset.name;
-      _expanded = _expanded === name ? null : name;
+
+      if (_expanded === name) {
+        _expanded = null;
+        render();
+        return;
+      }
+
+      _expanded = name;
+
+      if (!_courseCache[name] && !_courseLoading.has(name)) {
+        _courseLoading.add(name);
+        render(); // 顯示 loading 狀態
+        _courseCache[name] = await fetchCourseReviews(name);
+        _courseLoading.delete(name);
+      }
+
+      if (_expanded === name) render();
+    });
+  });
+
+  // 查看更多
+  document.querySelectorAll('.rv-more-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = `${btn.dataset.course}|||${btn.dataset.instructor}`;
+      _showAllKey.add(key);
       render();
     });
   });
 
   // 星等選取
   document.querySelectorAll('.rv-star-row').forEach(row => {
-    const highlight = v =>
+    const hl = v =>
       row.querySelectorAll('.rv-s').forEach((s, i) =>
         s.classList.toggle('active', i < v));
 
     row.querySelectorAll('.rv-s').forEach(s => {
-      s.addEventListener('mouseenter', () => highlight(+s.dataset.v));
-      s.addEventListener('mouseleave', () => highlight(+row.dataset.v));
+      s.addEventListener('mouseenter', () => hl(+s.dataset.v));
+      s.addEventListener('mouseleave', () => hl(+row.dataset.v));
       s.addEventListener('click', e => {
         e.stopPropagation();
         row.dataset.v = s.dataset.v;
-        highlight(+s.dataset.v);
+        hl(+s.dataset.v);
       });
     });
   });
@@ -254,7 +303,11 @@ function bindEvents() {
 
       const ok = await submitReview({ course_name: name, nickname, rating, comment, instructor });
       if (ok) {
-        _reviews = await fetchAllReviews();
+        // 只更新相關資料，不全部重撈
+        [_statRows, _courseCache[name]] = await Promise.all([
+          fetchReviewStats(),
+          fetchCourseReviews(name),
+        ]);
         render();
       } else {
         btn.disabled    = false;
@@ -267,14 +320,12 @@ function bindEvents() {
 
 // ── 初始化（匯出）────────────────────────────────────────────
 export async function initReviews() {
-  // 綁定搜尋框
   const searchIn    = document.getElementById('rv-search');
   const searchClear = document.getElementById('rv-search-clear');
 
   searchIn?.addEventListener('input', () => {
     _query = searchIn.value.trim();
     searchClear.hidden = !_query;
-    // 搜尋時收合展開的課程
     if (_query) _expanded = null;
     render();
   });
@@ -289,7 +340,7 @@ export async function initReviews() {
 
   _loading = true;
   render();
-  _reviews = await fetchAllReviews();
-  _loading = false;
+  _statRows = await fetchReviewStats(); // 只撈輕量統計
+  _loading  = false;
   render();
 }

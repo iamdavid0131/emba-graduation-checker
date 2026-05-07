@@ -696,6 +696,24 @@ body {
   border-color: var(--indigo); background: #fff;
 }
 
+/* ── Show-more button ────────────────────────────────────────── */
+.rv-more-btn {
+  display: block; width: 100%;
+  margin-top: .4rem;
+  padding: .4rem;
+  background: none;
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  color: var(--indigo);
+  font-size: .8rem; font-weight: 600; font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.rv-more-btn:hover {
+  background: var(--indigo-l);
+  border-color: var(--indigo);
+}
+
 /* ── Search bar ──────────────────────────────────────────────── */
 .rv-search-wrap {
   display: flex; align-items: center;
