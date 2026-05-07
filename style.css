@@ -757,7 +757,61 @@ mark.rv-hl {
   padding: 0 1px;
 }
 
+/* ── Edit / Delete buttons ───────────────────────────────────── */
+.rv-edit-btn, .rv-del-btn {
+  border: none; background: none; cursor: pointer;
+  font-size: .78rem; padding: .1rem .3rem;
+  border-radius: 5px; line-height: 1;
+  opacity: 0; transition: opacity .15s, background .15s;
+  flex-shrink: 0;
+}
+.rv-item:hover .rv-edit-btn,
+.rv-item:hover .rv-del-btn { opacity: 1; }
+.rv-edit-btn:hover { background: #eef2ff; }
+.rv-del-btn:hover  { background: #fee2e2; }
+
+/* ── Inline edit form ────────────────────────────────────────── */
+.rv-item-editing {
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 2px rgba(99,102,241,.15);
+}
+.rv-edit-star-row {
+  display: flex; gap: .25rem;
+  justify-content: center;
+  margin: .35rem 0;
+}
+.rv-edit-comment {
+  width: 100%; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: .45rem .65rem;
+  font-size: .84rem; font-family: inherit;
+  outline: none; resize: vertical; transition: .15s;
+  background: var(--bg);
+}
+.rv-edit-comment:focus { border-color: var(--indigo); background: #fff; }
+.rv-edit-actions {
+  display: flex; gap: .5rem;
+  margin-top: .5rem;
+}
+.rv-save-btn, .rv-cancel-btn {
+  border: none; border-radius: 7px;
+  padding: .35rem .85rem;
+  font-size: .8rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; transition: .15s;
+}
+.rv-save-btn {
+  background: var(--indigo); color: #fff;
+  box-shadow: 0 2px 6px rgba(99,102,241,.3);
+}
+.rv-save-btn:hover   { background: var(--indigo-d); }
+.rv-save-btn:disabled { opacity: .6; cursor: not-allowed; }
+.rv-cancel-btn {
+  background: var(--bg); color: var(--muted);
+  border: 1.5px solid var(--border);
+}
+.rv-cancel-btn:hover { background: #f1f5f9; color: var(--text); }
+
 @media (max-width: 600px) {
   .rv-section-head { flex-direction: column; align-items: flex-start; gap: .75rem; }
   .rv-search-in { width: 140px; }
+  .rv-edit-btn, .rv-del-btn { opacity: 1; }
 }

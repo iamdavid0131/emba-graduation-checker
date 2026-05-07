@@ -2,7 +2,10 @@ import {
   REQUIRED_COURSES, CORE_COURSES,
   SPECIALTY_COURSES, COMMON_COURSES, COURSE_INSTRUCTORS,
 } from './data.js';
-import { fetchReviewStats, fetchCourseReviews, submitReview } from './reviews.js';
+import {
+  fetchReviewStats, fetchCourseReviews, submitReview,
+  deleteReview, updateReview, saveToken, getTokens,
+} from './reviews.js';
 
 // ── 課程分組 ──────────────────────────────────────────────────
 const GROUPS = [
@@ -24,6 +27,7 @@ let _showAllKey    = new Set();  // "courseName|||instructor" → 展開全部
 let _expanded      = null;
 let _loading       = true;
 let _query         = '';
+let _editingId     = null;  // 正在編輯的評價 id
 
 // ── 統計工具（讀 _statRows，輕量）────────────────────────────
 function overallStats(name) {
@@ -72,12 +76,37 @@ function highlight(name) {
 
 // ── HTML 片段 ─────────────────────────────────────────────────
 function reviewItemHtml(r) {
+  const tokens  = getTokens();
+  const isOwner = r.id && tokens[r.id];
+  const editing = _editingId === r.id;
+
+  if (editing) {
+    // 內聯編輯表單
+    return `
+      <div class="rv-item rv-item-editing" data-id="${r.id}">
+        <div class="rv-edit-star-row" data-id="${r.id}" data-v="${r.rating}">
+          ${[1,2,3,4,5].map(i =>
+            `<span class="rv-s ${i <= r.rating ? 'active' : ''}" data-v="${i}">★</span>`
+          ).join('')}
+        </div>
+        <textarea class="rv-edit-comment" data-id="${r.id}" rows="2" maxlength="200">${r.comment || ''}</textarea>
+        <div class="rv-edit-actions">
+          <button class="rv-save-btn" data-id="${r.id}">✓ 儲存</button>
+          <button class="rv-cancel-btn" data-id="${r.id}">✕ 取消</button>
+        </div>
+      </div>`;
+  }
+
   return `
-    <div class="rv-item">
+    <div class="rv-item" data-id="${r.id}">
       <div class="rv-item-top">
         <span class="rv-nick">${r.nickname}</span>
         <span class="rv-item-stars" style="color:#f59e0b">${'★'.repeat(r.rating)}<span style="color:#cbd5e1">${'★'.repeat(5 - r.rating)}</span></span>
         <span class="rv-ago">${timeAgo(r.created_at)}</span>
+        ${isOwner ? `
+          <button class="rv-edit-btn" data-id="${r.id}" title="編輯">✏️</button>
+          <button class="rv-del-btn"  data-id="${r.id}" title="刪除">🗑️</button>
+        ` : ''}
       </div>
       ${r.comment ? `<p class="rv-txt">${r.comment}</p>` : ''}
     </div>`;
@@ -304,9 +333,9 @@ function bindEvents() {
       btn.disabled    = true;
       btn.textContent = '送出中…';
 
-      const ok = await submitReview({ course_name: name, nickname, rating, comment, instructor });
-      if (ok) {
-        // 只更新相關資料，不全部重撈
+      const row = await submitReview({ course_name: name, nickname, rating, comment, instructor });
+      if (row) {
+        if (row.id && row.token) saveToken(row.id, row.token);
         [_statRows, _courseCache[name]] = await Promise.all([
           fetchReviewStats(),
           fetchCourseReviews(name),
@@ -316,6 +345,110 @@ function bindEvents() {
         btn.disabled    = false;
         btn.textContent = '送出評價';
         alert('送出失敗，請稍後再試');
+      }
+    });
+  });
+
+  // ── 編輯按鈕 ─────────────────────────────────────────────────
+  document.querySelectorAll('.rv-edit-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      _editingId = btn.dataset.id;
+      render();
+    });
+  });
+
+  // ── 取消編輯 ─────────────────────────────────────────────────
+  document.querySelectorAll('.rv-cancel-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      _editingId = null;
+      render();
+    });
+  });
+
+  // ── 儲存編輯 ─────────────────────────────────────────────────
+  document.querySelectorAll('.rv-save-btn').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const id      = btn.dataset.id;
+      const token   = getTokens()[id];
+      if (!token) return;
+
+      const starRow   = document.querySelector(`.rv-edit-star-row[data-id="${id}"]`);
+      const commentEl = document.querySelector(`.rv-edit-comment[data-id="${id}"]`);
+      const rating    = starRow ? +starRow.dataset.v : 0;
+      const comment   = commentEl?.value.trim() || '';
+
+      if (!rating) { alert('請先選擇星等！'); return; }
+
+      btn.disabled    = true;
+      btn.textContent = '儲存中…';
+
+      // 找出評價所屬課程
+      const courseName = Object.keys(_courseCache).find(
+        cn => _courseCache[cn]?.some(r => r.id === id)
+      );
+
+      const ok = await updateReview(id, token, rating, comment);
+      if (ok && courseName) {
+        _editingId = null;
+        [_statRows, _courseCache[courseName]] = await Promise.all([
+          fetchReviewStats(),
+          fetchCourseReviews(courseName),
+        ]);
+        render();
+      } else {
+        btn.disabled    = false;
+        btn.textContent = '✓ 儲存';
+        alert('更新失敗，請稍後再試');
+      }
+    });
+  });
+
+  // ── 星等選取（編輯表單）──────────────────────────────────────
+  document.querySelectorAll('.rv-edit-star-row').forEach(row => {
+    const hl = v =>
+      row.querySelectorAll('.rv-s').forEach((s, i) =>
+        s.classList.toggle('active', i < v));
+
+    row.querySelectorAll('.rv-s').forEach(s => {
+      s.addEventListener('mouseenter', () => hl(+s.dataset.v));
+      s.addEventListener('mouseleave', () => hl(+row.dataset.v));
+      s.addEventListener('click', e => {
+        e.stopPropagation();
+        row.dataset.v = s.dataset.v;
+        hl(+s.dataset.v);
+      });
+    });
+  });
+
+  // ── 刪除按鈕 ─────────────────────────────────────────────────
+  document.querySelectorAll('.rv-del-btn').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (!confirm('確定要刪除這則評價？')) return;
+
+      const id    = btn.dataset.id;
+      const token = getTokens()[id];
+      if (!token) return;
+
+      const courseName = Object.keys(_courseCache).find(
+        cn => _courseCache[cn]?.some(r => r.id === id)
+      );
+
+      btn.disabled = true;
+
+      const ok = await deleteReview(id, token);
+      if (ok && courseName) {
+        [_statRows, _courseCache[courseName]] = await Promise.all([
+          fetchReviewStats(),
+          fetchCourseReviews(courseName),
+        ]);
+        render();
+      } else {
+        btn.disabled = false;
+        alert('刪除失敗，請稍後再試');
       }
     });
   });
