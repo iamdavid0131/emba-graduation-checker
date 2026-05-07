@@ -18,6 +18,7 @@ const GROUPS = [
 let _reviews  = [];
 let _expanded = null;
 let _loading  = true;
+let _query    = '';
 
 // ── 工具 ──────────────────────────────────────────────────────
 function overallStats(name) {
@@ -147,6 +148,12 @@ function panelHtml(name) {
     </div>`;
 }
 
+function highlight(name) {
+  if (!_query) return name;
+  const re = new RegExp(`(${_query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return name.replace(re, '<mark class="rv-hl">$1</mark>');
+}
+
 function courseHtml(name) {
   const { avg, count } = overallStats(name);
   const open = _expanded === name;
@@ -156,7 +163,7 @@ function courseHtml(name) {
   return `
     <div class="rv-course ${open ? 'rv-open' : ''}" data-name="${name}">
       <div class="rv-course-row">
-        <span class="rv-cname">${name}</span>
+        <span class="rv-cname">${highlight(name)}</span>
         <span class="rv-meta">${metaHtml}</span>
         <span class="rv-chevron">${open ? '▲' : '▼'}</span>
       </div>
@@ -174,7 +181,18 @@ function render() {
     return;
   }
 
-  el.innerHTML = GROUPS.map(g => `
+  const q = _query.toLowerCase();
+  const filtered = GROUPS.map(g => ({
+    ...g,
+    courses: q ? g.courses.filter(c => c.toLowerCase().includes(q)) : g.courses,
+  })).filter(g => g.courses.length);
+
+  if (q && !filtered.length) {
+    el.innerHTML = `<p class="rv-empty" style="padding:2rem;text-align:center">找不到「${_query}」相關課程</p>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(g => `
     <div class="rv-group">
       <h3 class="rv-group-title">${g.label}</h3>
       ${g.courses.map(courseHtml).join('')}
@@ -249,6 +267,26 @@ function bindEvents() {
 
 // ── 初始化（匯出）────────────────────────────────────────────
 export async function initReviews() {
+  // 綁定搜尋框
+  const searchIn    = document.getElementById('rv-search');
+  const searchClear = document.getElementById('rv-search-clear');
+
+  searchIn?.addEventListener('input', () => {
+    _query = searchIn.value.trim();
+    searchClear.hidden = !_query;
+    // 搜尋時收合展開的課程
+    if (_query) _expanded = null;
+    render();
+  });
+
+  searchClear?.addEventListener('click', () => {
+    searchIn.value = '';
+    _query = '';
+    searchClear.hidden = true;
+    searchIn.focus();
+    render();
+  });
+
   _loading = true;
   render();
   _reviews = await fetchAllReviews();
