@@ -45,6 +45,61 @@
       </div>
     </section>
 
+    <!-- Tabs: course checklists -->
+    <section class="card checklist-card">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="required">必修科目</button>
+        <button class="tab-btn" data-tab="core">核心科目</button>
+        <button class="tab-btn" data-tab="specialty">專業科目</button>
+        <button class="tab-btn" data-tab="common">共同科目</button>
+        <button class="tab-btn" data-tab="misc">補修 ／ 口試前</button>
+      </div>
+
+      <!-- Required -->
+      <div id="pane-required" class="tab-pane active">
+        <p class="pane-note">應修 12 學分（必修學科 6 學分 ＋ 碩士論文 6 學分）</p>
+        <div id="list-required" class="course-list"></div>
+      </div>
+
+      <!-- Core -->
+      <div id="pane-core" class="tab-pane">
+        <p class="pane-note">至少選修 <strong>4 門</strong></p>
+        <div id="list-core" class="course-list"></div>
+      </div>
+
+      <!-- Specialty -->
+      <div id="pane-specialty" class="tab-pane">
+        <p class="pane-note" id="specialty-note">請先選擇組別</p>
+        <div id="list-specialty"></div>
+      </div>
+
+      <!-- Common -->
+      <div id="pane-common" class="tab-pane">
+        <p class="pane-note">核心 ＋ 專業 ＋ 共同，累計至少 <strong>12 門、36 學分</strong></p>
+        <div id="list-common" class="course-list"></div>
+      </div>
+
+      <!-- Misc -->
+      <div id="pane-misc" class="tab-pane">
+        <p class="pane-note">補修大學部基礎科目（如被要求）及口試申請前條件</p>
+        <h3 class="sub-title">補修科目</h3>
+        <div id="list-remedial" class="course-list"></div>
+        <h3 class="sub-title" style="margin-top:1.5rem">申請口試前應完成</h3>
+        <div class="course-list">
+          <label class="course-item" id="item-ethics">
+            <input type="checkbox" id="cb-ethics" data-cat="ethics">
+            <span class="check-icon"></span>
+            <span class="course-name">學術倫理教育</span>
+          </label>
+          <label class="course-item" id="item-cert">
+            <input type="checkbox" id="cb-cert" data-cat="cert">
+            <span class="check-icon"></span>
+            <span class="course-name">繳交「修課證明」</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
     <!-- Checked summary -->
     <section class="card" id="checked-summary-card">
       <h2 class="card-title">已勾選科目</h2>
@@ -114,61 +169,6 @@
       </div>
     </section>
 
-    <!-- Tabs: course checklists -->
-    <section class="card checklist-card">
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="required">必修科目</button>
-        <button class="tab-btn" data-tab="core">核心科目</button>
-        <button class="tab-btn" data-tab="specialty">專業科目</button>
-        <button class="tab-btn" data-tab="common">共同科目</button>
-        <button class="tab-btn" data-tab="misc">補修 ／ 口試前</button>
-      </div>
-
-      <!-- Required -->
-      <div id="pane-required" class="tab-pane active">
-        <p class="pane-note">應修 12 學分（必修學科 6 學分 ＋ 碩士論文 6 學分）</p>
-        <div id="list-required" class="course-list"></div>
-      </div>
-
-      <!-- Core -->
-      <div id="pane-core" class="tab-pane">
-        <p class="pane-note">至少選修 <strong>4 門</strong></p>
-        <div id="list-core" class="course-list"></div>
-      </div>
-
-      <!-- Specialty -->
-      <div id="pane-specialty" class="tab-pane">
-        <p class="pane-note" id="specialty-note">請先選擇組別</p>
-        <div id="list-specialty"></div>
-      </div>
-
-      <!-- Common -->
-      <div id="pane-common" class="tab-pane">
-        <p class="pane-note">核心 ＋ 專業 ＋ 共同，累計至少 <strong>12 門、36 學分</strong></p>
-        <div id="list-common" class="course-list"></div>
-      </div>
-
-      <!-- Misc -->
-      <div id="pane-misc" class="tab-pane">
-        <p class="pane-note">補修大學部基礎科目（如被要求）及口試申請前條件</p>
-        <h3 class="sub-title">補修科目</h3>
-        <div id="list-remedial" class="course-list"></div>
-        <h3 class="sub-title" style="margin-top:1.5rem">申請口試前應完成</h3>
-        <div class="course-list">
-          <label class="course-item" id="item-ethics">
-            <input type="checkbox" id="cb-ethics" data-cat="ethics">
-            <span class="check-icon"></span>
-            <span class="course-name">學術倫理教育</span>
-          </label>
-          <label class="course-item" id="item-cert">
-            <input type="checkbox" id="cb-cert" data-cat="cert">
-            <span class="check-icon"></span>
-            <span class="course-name">繳交「修課證明」</span>
-          </label>
-        </div>
-      </div>
-
-    </section>
   </div>
 
 </main>
