@@ -124,9 +124,10 @@ export function exportInfographic(state, analyze) {
   ctx.font      = "bold 32px 'Noto Sans TC', sans-serif";
   ctx.fillStyle = C.text;
   ctx.fillText(`${r.totalDone}`, PAD + 80, Y + 14);
+  const totalDoneW = ctx.measureText(`${r.totalDone}`).width;
   ctx.font      = "500 16px 'Noto Sans TC', sans-serif";
   ctx.fillStyle = C.muted;
-  ctx.fillText(`/ ${r.totalNeed} 學分`, PAD + 80 + ctx.measureText(`${r.totalDone}`).width + 4, Y + 14);
+  ctx.fillText(`/ ${r.totalNeed} 學分`, PAD + 80 + totalDoneW + 6, Y + 14);
 
   ctx.textAlign = "right";
   ctx.font      = "bold 28px 'Noto Sans TC', sans-serif";
@@ -159,9 +160,10 @@ export function exportInfographic(state, analyze) {
     ctx.font      = `bold 26px 'Noto Sans TC', sans-serif`;
     ctx.fillStyle = C.text;
     ctx.fillText(`${c.done}`, cx + 14, Y + 52);
+    const doneW = ctx.measureText(`${c.done}`).width;
     ctx.font      = "500 14px 'Noto Sans TC', sans-serif";
     ctx.fillStyle = C.muted;
-    ctx.fillText(` / ${c.need}`, cx + 14 + ctx.measureText(`${c.done}`).width, Y + 52);
+    ctx.fillText(` / ${c.need}`, cx + 14 + doneW, Y + 52);
 
     if (c.sub) {
       ctx.font      = "600 13px 'Noto Sans TC', sans-serif";
