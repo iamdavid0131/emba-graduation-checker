@@ -254,6 +254,56 @@ function buildRecommendations(r) {
   ).join("");
 }
 
+// ── Checked Summary ───────────────────────────────────────────
+function renderCheckedSummary() {
+  const groups = [
+    {
+      label: "必修",
+      color: "var(--indigo)",
+      items: REQUIRED_COURSES
+        .filter(c => state.required.has(c.id))
+        .map(c => c.name),
+    },
+    {
+      label: "核心",
+      color: "var(--purple)",
+      items: CORE_COURSES.filter(c => state.core.has(c)),
+    },
+    {
+      label: "專業",
+      color: "var(--teal)",
+      items: Object.values(SPECIALTY_COURSES).flat().filter(c => state.specialty.has(c)),
+    },
+    {
+      label: "共同",
+      color: "var(--green)",
+      items: COMMON_COURSES.filter(c => state.common.has(c)),
+    },
+  ];
+
+  const total = groups.reduce((s, g) => s + g.items.length, 0);
+  const container = document.getElementById("checked-summary");
+  const card      = document.getElementById("checked-summary-card");
+
+  if (total === 0) {
+    container.innerHTML = `<p class="summary-empty">尚未勾選任何科目</p>`;
+    card.style.display = "";
+    return;
+  }
+
+  card.style.display = "";
+  container.innerHTML = groups
+    .filter(g => g.items.length > 0)
+    .map(g => `
+      <div class="summary-group">
+        <span class="summary-label" style="background:${g.color}20;color:${g.color}">${g.label}</span>
+        <div class="summary-chips">
+          ${g.items.map(name => `<span class="summary-chip">${name}</span>`).join("")}
+        </div>
+      </div>`)
+    .join("");
+}
+
 // ── Main Render ───────────────────────────────────────────────
 function render() {
   const r = analyze();
@@ -309,6 +359,9 @@ function render() {
     pill("學術倫理",     r.ethicsDone),
     pill("修課證明",     r.certSubmitted),
   ].join("");
+
+  // ── Checked summary
+  renderCheckedSummary();
 
   // ── Donut centre text
   document.getElementById("donut-center").innerHTML =

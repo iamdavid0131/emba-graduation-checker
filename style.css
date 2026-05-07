@@ -244,6 +244,23 @@ body {
 }
 .no-track { color: var(--muted); font-size: .84rem; padding: .5rem 0; }
 
+/* ── Checked summary ────────────────────────────────────────── */
+.summary-empty { font-size: .82rem; color: var(--muted); padding: .25rem 0; }
+.summary-group { margin-bottom: .75rem; display: flex; gap: .6rem; align-items: flex-start; }
+.summary-group:last-child { margin-bottom: 0; }
+.summary-label {
+  font-size: .7rem; font-weight: 700;
+  padding: .2rem .55rem; border-radius: 6px;
+  white-space: nowrap; flex-shrink: 0; margin-top: .1rem;
+}
+.summary-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.summary-chip {
+  font-size: .75rem; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border);
+  padding: .18rem .5rem; border-radius: 6px;
+  line-height: 1.4;
+}
+
 /* ── Specialty groups ───────────────────────────────────────── */
 .spec-group { margin-bottom: 1.25rem; }
 .spec-group:last-child { margin-bottom: 0; }
