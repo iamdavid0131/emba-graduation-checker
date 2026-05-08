@@ -41,8 +41,17 @@ body {
 }
 .header-brand { display: flex; align-items: center; gap: .75rem; }
 .brand-icon { font-size: 2rem; line-height: 1; }
-.header-brand h1 { font-size: 1.15rem; font-weight: 700; color: #fff; }
-.header-brand p  { font-size: .8rem; color: rgba(255,255,255,.7); }
+.header-brand h1 { font-size: 1.15rem; font-weight: 700; color: #fff; letter-spacing: .01em; }
+.header-brand p  { font-size: .8rem; color: rgba(255,255,255,.65); }
+.header-amp {
+  font-weight: 900;
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 6px rgba(251,191,36,.45));
+  padding: 0 .05em;
+}
 
 .header-actions { display: flex; gap: .6rem; align-items: center; }
 
