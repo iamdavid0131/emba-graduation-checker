@@ -323,6 +323,15 @@ function render() {
     cb.closest(".course-item").classList.toggle("is-done", cb.checked);
   });
 
+  // ── Specialty group counters（每次 render 同步更新，避免計數顯示停滯）
+  Object.entries(SPECIALTY_COURSES).forEach(([t, courses]) => {
+    const badge = document.querySelector(`.spec-group[data-track="${t}"] .spec-count`);
+    if (!badge) return;
+    const done = courses.filter(c => state.specialty.has(c)).length;
+    badge.textContent = `${done} / ${courses.length}`;
+    badge.classList.toggle("spec-count-has", done > 0);
+  });
+
   // ── Oral conditions
   document.getElementById("cb-ethics").checked   = state.ethicsDone;
   document.getElementById("cb-cert").checked     = state.certSubmitted;
@@ -389,7 +398,7 @@ function renderSpecialty() {
     const isMyTrack = t === track;
     const doneCount = courses.filter(c => state.specialty.has(c)).length;
     return `
-      <div class="spec-group ${isMyTrack ? "spec-my-track" : ""}">
+      <div class="spec-group ${isMyTrack ? "spec-my-track" : ""}" data-track="${t}">
         <div class="spec-group-header">
           <span class="spec-group-title">${t}組</span>
           ${isMyTrack ? `<span class="spec-my-badge">您的組別　需 ${RULES.specialtyMin} 門</span>` : ""}
