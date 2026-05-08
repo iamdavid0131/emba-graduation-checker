@@ -390,9 +390,13 @@ function renderSpecialty() {
   const list  = document.getElementById("list-specialty");
   const note  = document.getElementById("specialty-note");
 
-  note.textContent = track
-    ? `您的組別：${track}組（需至少 ${RULES.specialtyMin} 門）　其他組別科目亦可選修計入總學分`
-    : "所有組別的專業科目　請先選擇組別以標示畢業門檻";
+  if (track) {
+    note.textContent = `您的組別：${track}組（需至少 ${RULES.specialtyMin} 門）　其他組別科目亦可選修計入總學分`;
+    note.className = "pane-note";
+  } else {
+    note.innerHTML = `⚠️ 請先在上方選擇您的<strong>組別</strong>，系統才能正確標示畢業門檻`;
+    note.className = "pane-note pane-note-warn";
+  }
 
   list.innerHTML = Object.entries(SPECIALTY_COURSES).map(([t, courses]) => {
     const isMyTrack = t === track;
