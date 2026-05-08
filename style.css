@@ -402,7 +402,7 @@ body {
 ══════════════════════════════════════════════════════════════ */
 @media (min-width: 901px) {
 
-  /* ── 側邊欄 sticky + 自身可捲動 ─────────────────────────── */
+  /* ── 側邊欄 sticky（僅含統計圖表，高度可控）────────────── */
   .sidebar {
     position: sticky;
     top: calc(var(--header-h, 88px) + .75rem);
@@ -416,16 +416,6 @@ body {
   .sidebar::-webkit-scrollbar { width: 4px; }
   .sidebar::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 2px; }
   .sidebar::-webkit-scrollbar-track { background: transparent; }
-
-  /* ── tab pane 高度上限，避免側邊欄過長 ──────────────────── */
-  .tab-pane.active {
-    max-height: 320px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .tab-pane.active::-webkit-scrollbar { width: 4px; }
-  .tab-pane.active::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   /* ── bar chart 高一些 ────────────────────────────────────── */
   .bar-wrap { height: 300px; }
@@ -477,6 +467,7 @@ body {
 
   /* ── Layout ────────────────────────────────────────────────── */
   .layout { padding: .75rem; gap: .75rem; }
+  .content { order: -1; }   /* 組別+課程先於圖表統計 */
   .card   { padding: .9rem; }
   .card-title { font-size: .75rem; margin-bottom: .7rem; }
 

@@ -35,6 +35,61 @@
   <!-- ─── Left column ────────────────────────────────────────── -->
   <aside class="sidebar">
 
+    <!-- Donut chart -->
+    <section class="card chart-card">
+      <h2 class="card-title">整體進度</h2>
+      <div class="donut-wrap">
+        <canvas id="donut-chart"></canvas>
+        <div id="donut-center" class="donut-center">
+          <div class="donut-big">0</div>
+          <div class="donut-sub">/ 48 學分</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div id="card-total" class="stat-card card-neutral">
+        <div class="stat-label">總學分</div>
+        <div class="stat-value">
+          <span id="stat-total-done">0</span>
+          <span class="stat-denom">/ <span id="stat-total-need">48</span></span>
+        </div>
+        <div class="stat-sub" id="stat-pct">0%</div>
+      </div>
+      <div id="card-elec" class="stat-card card-ng">
+        <div class="stat-label">選修學分</div>
+        <div class="stat-value">
+          <span id="stat-elec-done">0</span>
+          <span class="stat-denom">/ <span id="stat-elec-need">36</span></span>
+        </div>
+      </div>
+      <div id="card-courses" class="stat-card card-ng">
+        <div class="stat-label">選修門數</div>
+        <div class="stat-value">
+          <span id="stat-courses-done">0</span>
+          <span class="stat-denom">/ <span id="stat-courses-need">12</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bars -->
+    <section class="card">
+      <h2 class="card-title">分項進度</h2>
+      <div id="prog-bars"></div>
+    </section>
+
+    <!-- Graduation checklist pills -->
+    <section class="card">
+      <h2 class="card-title">畢業條件檢核</h2>
+      <div id="summary-pills" class="pills-wrap"></div>
+    </section>
+
+  </aside>
+
+  <!-- ─── Right column ───────────────────────────────────────── -->
+  <div class="content">
+
     <!-- Track selector -->
     <section class="card">
       <h2 class="card-title">目前組別</h2>
@@ -102,73 +157,12 @@
       </div>
     </section>
 
-    <!-- Donut chart -->
-    <section class="card chart-card">
-      <h2 class="card-title">整體進度</h2>
-      <div class="donut-wrap">
-        <canvas id="donut-chart"></canvas>
-        <div id="donut-center" class="donut-center">
-          <div class="donut-big">0</div>
-          <div class="donut-sub">/ 48 學分</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Stat cards -->
-    <div class="stat-row">
-      <div id="card-total" class="stat-card card-neutral">
-        <div class="stat-label">總學分</div>
-        <div class="stat-value">
-          <span id="stat-total-done">0</span>
-          <span class="stat-denom">/ <span id="stat-total-need">48</span></span>
-        </div>
-        <div class="stat-sub" id="stat-pct">0%</div>
-      </div>
-      <div id="card-elec" class="stat-card card-ng">
-        <div class="stat-label">選修學分</div>
-        <div class="stat-value">
-          <span id="stat-elec-done">0</span>
-          <span class="stat-denom">/ <span id="stat-elec-need">36</span></span>
-        </div>
-      </div>
-      <div id="card-courses" class="stat-card card-ng">
-        <div class="stat-label">選修門數</div>
-        <div class="stat-value">
-          <span id="stat-courses-done">0</span>
-          <span class="stat-denom">/ <span id="stat-courses-need">12</span></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Progress bars -->
-    <section class="card">
-      <h2 class="card-title">分項進度</h2>
-      <div id="prog-bars"></div>
-    </section>
-
-    <!-- Graduation checklist pills -->
-    <section class="card">
-      <h2 class="card-title">畢業條件檢核</h2>
-      <div id="summary-pills" class="pills-wrap"></div>
-    </section>
-
-  </aside>
-
-  <!-- ─── Right column ───────────────────────────────────────── -->
-  <div class="content">
-
     <!-- Bar chart -->
     <section class="card">
       <h2 class="card-title">各類別進度</h2>
       <div class="bar-wrap">
         <canvas id="bar-chart"></canvas>
       </div>
-    </section>
-
-    <!-- Recommendations -->
-    <section class="card" id="rec-card">
-      <h2 class="card-title">選課建議</h2>
-      <div id="rec-list" class="rec-list"></div>
     </section>
 
   </div>

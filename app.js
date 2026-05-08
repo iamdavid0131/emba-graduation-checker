@@ -336,8 +336,6 @@ function render() {
   document.getElementById("cb-ethics").checked   = state.ethicsDone;
   document.getElementById("cb-cert").checked     = state.certSubmitted;
 
-  // ── Recommendations（右欄）
-  document.getElementById("rec-list").innerHTML = buildRecommendations(r);
 }
 
 // ── Event delegation ──────────────────────────────────────────
