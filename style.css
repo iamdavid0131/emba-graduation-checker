@@ -398,6 +398,48 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   Desktop ≥ 901px
+══════════════════════════════════════════════════════════════ */
+@media (min-width: 901px) {
+
+  /* ── 側邊欄 sticky + 自身可捲動 ─────────────────────────── */
+  .sidebar {
+    position: sticky;
+    top: calc(var(--header-h, 88px) + .75rem);
+    max-height: calc(100vh - var(--header-h, 88px) - 1.5rem);
+    overflow-y: auto;
+    overflow-x: visible;
+    padding-right: 3px;
+    scrollbar-width: thin;
+    scrollbar-color: #c7d2fe transparent;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 2px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+
+  /* ── tab pane 高度上限，避免側邊欄過長 ──────────────────── */
+  .tab-pane.active {
+    max-height: 320px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .tab-pane.active::-webkit-scrollbar { width: 4px; }
+  .tab-pane.active::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── bar chart 高一些 ────────────────────────────────────── */
+  .bar-wrap { height: 300px; }
+
+  /* ── 課程評價：群組 2 欄並排 ─────────────────────────────── */
+  #rv-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
    Mobile  ≤ 600px
 ══════════════════════════════════════════════════════════════ */
 @media (max-width: 600px) {

@@ -335,6 +335,9 @@ function render() {
   // ── Oral conditions
   document.getElementById("cb-ethics").checked   = state.ethicsDone;
   document.getElementById("cb-cert").checked     = state.certSubmitted;
+
+  // ── Recommendations（右欄）
+  document.getElementById("rec-list").innerHTML = buildRecommendations(r);
 }
 
 // ── Event delegation ──────────────────────────────────────────
@@ -461,6 +464,13 @@ function initReset() {
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+  // 把 header 高度存成 CSS 變數，供 sticky sidebar 使用
+  const hdr = document.querySelector(".site-header");
+  const setHeaderH = () =>
+    document.documentElement.style.setProperty("--header-h", hdr.offsetHeight + "px");
+  setHeaderH();
+  new ResizeObserver(setHeaderH).observe(hdr);
+
   loadState();
   buildDOM();
   initCharts();
