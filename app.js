@@ -1,6 +1,7 @@
 import {
   TRACKS, REQUIRED_COURSES, CORE_COURSES,
-  SPECIALTY_COURSES, COMMON_COURSES, REMEDIAL_COURSES, RULES
+  SPECIALTY_COURSES, COMMON_COURSES, REMEDIAL_COURSES, RULES,
+  NEW_COURSES,
 } from "./data.js";
 import { exportInfographic } from "./export.js";
 import { initReviews } from "./reviews-ui.js";
@@ -196,11 +197,13 @@ function buildCourseSection(category, courses, stateSet, idPrefix) {
   return courses.map(name => {
     const id    = `${idPrefix}_${name}`;
     const checked = stateSet.has(name) ? "checked" : "";
+    const newBadge = NEW_COURSES.has(name) ? `<span class="new-badge">NEW</span>` : "";
     return `
       <label class="course-item ${stateSet.has(name) ? "is-done" : ""}" data-id="${id}">
         <input type="checkbox" id="${id}" data-cat="${category}" data-name="${name}" ${checked}>
         <span class="check-icon"></span>
         <span class="course-name">${name}</span>
+        ${newBadge}
       </label>`;
   }).join("");
 }
