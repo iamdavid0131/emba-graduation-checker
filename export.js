@@ -1,4 +1,4 @@
-import { RULES } from "./data.js";
+import { RULES } from "./data.js?v=14";
 
 // ── 顏色常數 ──────────────────────────────────────────────────
 const C = {
