@@ -1,11 +1,11 @@
 import {
   REQUIRED_COURSES, CORE_COURSES,
   SPECIALTY_COURSES, COMMON_COURSES, COURSE_INSTRUCTORS,
-} from './data.js?v=15';
+} from './data.js?v=16';
 import {
   fetchReviewStats, fetchCourseReviews, submitReview,
   deleteReview, updateReview, saveToken, getTokens,
-} from './reviews.js?v=15';
+} from './reviews.js?v=16';
 
 // ── 課程分組 ──────────────────────────────────────────────────
 const GROUPS = [
@@ -68,6 +68,13 @@ function stars(n, color = false) {
     : filled + empty;
 }
 
+// 使用者輸入（暱稱、評論、教師）插入 HTML 前一律跳脫
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
 function highlight(name) {
   if (!_query) return name;
   const re = new RegExp(`(${_query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
@@ -89,7 +96,7 @@ function reviewItemHtml(r) {
             `<span class="rv-s ${i <= r.rating ? 'active' : ''}" data-v="${i}">★</span>`
           ).join('')}
         </div>
-        <textarea class="rv-edit-comment" data-id="${r.id}" rows="2" maxlength="200">${r.comment || ''}</textarea>
+        <textarea class="rv-edit-comment" data-id="${r.id}" rows="2" maxlength="200">${esc(r.comment)}</textarea>
         <div class="rv-edit-actions">
           <button class="rv-save-btn" data-id="${r.id}">✓ 儲存</button>
           <button class="rv-cancel-btn" data-id="${r.id}">✕ 取消</button>
@@ -100,7 +107,7 @@ function reviewItemHtml(r) {
   return `
     <div class="rv-item" data-id="${r.id}">
       <div class="rv-item-top">
-        <span class="rv-nick">${r.nickname}</span>
+        <span class="rv-nick">${esc(r.nickname)}</span>
         <span class="rv-item-stars" style="color:#f59e0b">${'★'.repeat(r.rating)}<span style="color:#cbd5e1">${'★'.repeat(5 - r.rating)}</span></span>
         <span class="rv-ago">${timeAgo(r.created_at)}</span>
         ${isOwner ? `
@@ -108,7 +115,7 @@ function reviewItemHtml(r) {
           <button class="rv-del-btn"  data-id="${r.id}" title="刪除">🗑️</button>
         ` : ''}
       </div>
-      ${r.comment ? `<p class="rv-txt">${r.comment}</p>` : ''}
+      ${r.comment ? `<p class="rv-txt">${esc(r.comment)}</p>` : ''}
     </div>`;
 }
 
@@ -125,7 +132,7 @@ function instructorSectionHtml(courseName, instructor) {
   return `
     <div class="rv-instr-section">
       <div class="rv-instr-head">
-        <span class="rv-instr-name">👤 ${instructor}</span>
+        <span class="rv-instr-name">👤 ${esc(instructor)}</span>
         <span class="rv-instr-meta">
           ${count
             ? `<span style="color:#f59e0b">${'★'.repeat(Math.round(avg))}<span style="color:#cbd5e1">${'★'.repeat(5 - Math.round(avg))}</span></span>
@@ -141,7 +148,7 @@ function instructorSectionHtml(courseName, instructor) {
           ${!showAll && remaining > 0 ? `
             <button class="rv-more-btn"
               data-course="${courseName}"
-              data-instructor="${instructor}">
+              data-instructor="${esc(instructor)}">
               查看更多（還有 ${remaining} 則）▼
             </button>` : ''
           }
@@ -169,12 +176,12 @@ function panelHtml(name) {
 
   // 表單教師欄：只有一位 → 隱藏，自動帶入；多位 → 下拉；未知 → 文字輸入
   const instrFormField = allInstructors.length === 1
-    ? `<input type="hidden" class="rv-instr-sel" data-course="${name}" value="${allInstructors[0]}">
-       <span class="rv-instr-fixed">👤 ${allInstructors[0]}</span>`
+    ? `<input type="hidden" class="rv-instr-sel" data-course="${name}" value="${esc(allInstructors[0])}">
+       <span class="rv-instr-fixed">👤 ${esc(allInstructors[0])}</span>`
     : allInstructors.length > 1
       ? `<select class="rv-instr-sel" data-course="${name}">
            <option value="">選擇任課教師 *</option>
-           ${allInstructors.map(i => `<option value="${i}">${i}</option>`).join('')}
+           ${allInstructors.map(i => `<option value="${esc(i)}">${esc(i)}</option>`).join('')}
          </select>`
       : `<input class="rv-instr-in" data-course="${name}" placeholder="任課教師（必填）" maxlength="20">`;
 

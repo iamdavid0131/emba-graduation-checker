@@ -2,9 +2,9 @@ import {
   TRACKS, REQUIRED_COURSES, CORE_COURSES,
   SPECIALTY_COURSES, COMMON_COURSES, REMEDIAL_COURSES, RULES,
   NEW_COURSES,
-} from "./data.js?v=15";
-import { exportInfographic } from "./export.js?v=15";
-import { initReviews } from "./reviews-ui.js?v=15";
+} from "./data.js?v=16";
+import { exportInfographic } from "./export.js?v=16";
+import { initReviews } from "./reviews-ui.js?v=16";
 
 // ── State ─────────────────────────────────────────────────────
 let state = {
