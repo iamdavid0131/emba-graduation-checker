@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "emba-checker",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "7788"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["wrangler", "dev", "--port", "7788"],
       "port": 7788
     }
   ]

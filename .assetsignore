@@ -1,0 +1,14 @@
+# 不要當成靜態檔公開的東西
+worker.js
+wrangler.jsonc
+migration
+.claude
+.git
+.gitignore
+.wrangler
+.dev.vars*
+.env*
+.DS_Store
+node_modules
+package.json
+package-lock.json

@@ -1,11 +1,11 @@
 import {
   REQUIRED_COURSES, CORE_COURSES,
   SPECIALTY_COURSES, COMMON_COURSES, COURSE_INSTRUCTORS,
-} from './data.js?v=14';
+} from './data.js?v=15';
 import {
   fetchReviewStats, fetchCourseReviews, submitReview,
   deleteReview, updateReview, saveToken, getTokens,
-} from './reviews.js?v=14';
+} from './reviews.js?v=15';
 
 // ── 課程分組 ──────────────────────────────────────────────────
 const GROUPS = [

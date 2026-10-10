@@ -4,3 +4,8 @@
 !.dev.vars.example
 .env*
 !.env.example
+
+# 資料搬遷匯出檔（含編輯 token）
+migration/seed.sql
+.DS_Store
+node_modules
